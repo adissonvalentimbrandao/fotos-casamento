@@ -172,6 +172,7 @@ async function initCapture() {
   const loadingOverlay = document.getElementById('loading-overlay');
   const cameraFrame = document.getElementById('camera-frame');
   const successScreen = document.getElementById('success-screen');
+  const btnAnotherPhoto = document.getElementById('btn-another-photo');
 
   if (!token) {
     showToast(toastError, 'Link inválido. Escaneie o QR Code novamente.', true);
@@ -242,6 +243,31 @@ async function initCapture() {
     showEl(dockCamera);
     showEl(cameraFrame);
   }
+
+  function resetAfterSuccess() {
+    capturedBlob = null;
+    btnUpload.disabled = false;
+    hideToast(toastError);
+
+    successScreen.classList.add('d-none');
+    document.body.classList.remove('upload-done');
+
+    hideEl(preview);
+    showEl(video);
+    showEl(cameraFrame);
+    hideEl(dockPreview);
+    showEl(dockCamera);
+    document.body.classList.remove('preview-mode');
+
+    if (preview.src && preview.src.startsWith('blob:')) {
+      URL.revokeObjectURL(preview.src);
+    }
+    preview.removeAttribute('src');
+
+    startCamera();
+  }
+
+  btnAnotherPhoto.addEventListener('click', resetAfterSuccess);
 
   btnShutter.addEventListener('click', () => {
     const w = video.videoWidth;
