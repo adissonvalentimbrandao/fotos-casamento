@@ -4,6 +4,7 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const os = require('os');
+const archiver = require('archiver');
 const sqlite3 = require('sqlite3').verbose();
 const QRCode = require('qrcode');
 
@@ -124,7 +125,7 @@ app.get('/api/session', async (req, res) => {
     const qrDataUrl = await QRCode.toDataURL(captureUrl, {
       width: 320,
       margin: 2,
-      color: { dark: '#0f172a', light: '#ffffff' },
+      color: { dark: '#1c1917', light: '#ffffff' },
     });
 
     res.json({ token, captureUrl, qrDataUrl, baseUrl });
@@ -178,6 +179,54 @@ app.get('/api/photos', (_req, res) => {
       return res.status(500).json({ error: 'Erro ao buscar fotos' });
     }
     res.json(rows);
+  });
+});
+
+app.get('/api/photos/download', (req, res) => {
+  db.all('SELECT * FROM photos ORDER BY id ASC', [], (err, rows) => {
+    if (err) {
+      return res.status(500).json({ error: 'Erro ao buscar fotos' });
+    }
+
+    const files = rows
+      .map((photo) => {
+        const basename = path.basename(photo.image_path);
+        const filePath = path.join(UPLOADS_DIR, basename);
+        if (!fs.existsSync(filePath)) return null;
+        const pad = String(photo.id).padStart(4, '0');
+        const ext = path.extname(basename) || '.jpg';
+        return {
+          filePath,
+          name: `foto-${pad}${ext}`,
+        };
+      })
+      .filter(Boolean);
+
+    if (files.length === 0) {
+      return res.status(404).json({ error: 'Nenhuma foto disponível para download' });
+    }
+
+    const date = new Date().toISOString().slice(0, 10);
+    const zipName = `fotos-casamento-${date}.zip`;
+
+    res.setHeader('Content-Type', 'application/zip');
+    res.setHeader('Content-Disposition', `attachment; filename="${zipName}"`);
+
+    const archive = archiver('zip', { zlib: { level: 6 } });
+
+    archive.on('error', () => {
+      if (!res.headersSent) {
+        res.status(500).json({ error: 'Erro ao gerar o arquivo ZIP' });
+      }
+    });
+
+    archive.pipe(res);
+
+    for (const file of files) {
+      archive.file(file.filePath, { name: file.name });
+    }
+
+    archive.finalize();
   });
 });
 

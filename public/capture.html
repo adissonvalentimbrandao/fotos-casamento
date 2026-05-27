@@ -3,22 +3,20 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <meta name="theme-color" content="#0a0a0f">
+  <meta name="theme-color" content="#111111">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <title>Tirar Foto</title>
+  <title>Enviar foto</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/style.css">
 </head>
 <body data-page="capture" class="page-capture">
   <div class="capture-app">
     <header class="capture-topbar">
-      <div class="capture-brand">
-        <span class="capture-brand-icon">💒</span>
-        <div>
-          <strong>Fotos do Casamento</strong>
-          <span>Toque no botão para capturar</span>
-        </div>
-      </div>
+      <p class="capture-title">Enviar foto</p>
+      <p class="capture-subtitle">Toque no círculo para capturar</p>
     </header>
 
     <div id="toast-camera" class="capture-toast">Abrindo câmera...</div>
@@ -28,40 +26,29 @@
       <div class="camera-viewport" id="camera-viewport">
         <video id="video" autoplay playsinline muted></video>
         <canvas id="canvas" class="hidden"></canvas>
-        <img id="preview" class="preview-img hidden" alt="Sua foto">
+        <img id="preview" class="preview-img hidden" alt="Pré-visualização">
         <div class="camera-frame" id="camera-frame" aria-hidden="true"></div>
       </div>
     </main>
 
-    <!-- Controles: modo câmera -->
     <footer class="capture-dock" id="dock-camera">
-      <p class="dock-hint">Enquadre e toque para fotografar</p>
       <button type="button" id="btn-shutter" class="shutter-btn" disabled aria-label="Tirar foto">
-        <span class="shutter-ring"></span>
+        <span class="shutter-inner"></span>
       </button>
     </footer>
 
-    <!-- Controles: modo preview -->
     <footer class="capture-dock capture-dock-preview hidden" id="dock-preview">
-      <p class="dock-hint">Gostou da foto?</p>
       <div class="dock-actions">
-        <button type="button" id="btn-retake" class="btn btn-ghost">
-          <span class="btn-icon">↺</span>
-          Outra
-        </button>
-        <button type="button" id="btn-upload" class="btn btn-send">
-          <span class="btn-icon">↑</span>
-          Enviar
-        </button>
+        <button type="button" id="btn-retake" class="btn-capture btn-capture-muted">Tirar outra</button>
+        <button type="button" id="btn-upload" class="btn-capture btn-capture-primary">Enviar foto</button>
       </div>
     </footer>
 
-    <!-- Sucesso -->
     <div class="success-screen hidden" id="success-screen">
       <div class="success-card">
-        <div class="success-icon">✓</div>
-        <h2>Foto enviada!</h2>
-        <p>Obrigado por compartilhar este momento especial.</p>
+        <p class="success-label">Enviado</p>
+        <h2>Obrigado</h2>
+        <p>Sua foto foi recebida.</p>
       </div>
     </div>
   </div>

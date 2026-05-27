@@ -87,6 +87,7 @@ public/
 | `/` | QR Code para convidados |
 | `/capture/:token` | Tirar foto (celular) |
 | `/admin` | Galeria de fotos |
+| `GET /api/photos/download` | Download de todas as fotos em ZIP |
 | `/health` | Health check (Render) |
 
 ## Variáveis de ambiente

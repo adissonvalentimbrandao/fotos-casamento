@@ -3,82 +3,66 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta name="theme-color" content="#0f172a">
-  <title>Fotos Casamento — QR Code</title>
+  <meta name="theme-color" content="#faf9f7">
+  <title>Fotos do casamento</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/style.css">
 </head>
-<body data-page="home">
+<body data-page="home" class="page-light">
   <div class="app-shell">
     <header class="app-header">
-      <div class="logo">
-        <div class="logo-icon">📷</div>
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true"></span>
         <div>
-          <h1>Fotos Casamento</h1>
-          <p>Capture momentos via QR Code</p>
+          <h1>Fotos do casamento</h1>
+          <p>Compartilhe um momento pelo celular</p>
         </div>
       </div>
       <nav class="nav-links">
-        <a href="/admin" class="btn btn-secondary btn-sm">Admin</a>
-        <button type="button" id="btn-refresh" class="btn btn-primary btn-sm">Novo QR</button>
+        <a href="/admin" class="btn btn-outline btn-sm">Galeria</a>
+        <button type="button" id="btn-refresh" class="btn btn-solid btn-sm">Novo QR Code</button>
       </nav>
     </header>
 
     <div class="grid-2">
-      <section class="card qr-section">
-        <h2 class="card-title">Escaneie o QR Code</h2>
-        <p class="card-subtitle" id="qr-subtitle">Aponte a câmera do celular</p>
+      <section class="panel qr-section">
+        <h2 class="panel-title">QR Code</h2>
+        <p class="panel-lead" id="qr-subtitle">Escaneie com a câmera do celular</p>
 
-        <div class="network-badge" id="network-badge">Carregando...</div>
+        <p class="status-pill" id="network-badge">Carregando...</p>
 
-        <div class="qr-wrapper" id="qr-wrapper">
+        <div class="qr-frame" id="qr-wrapper">
           <div class="spinner" id="qr-loading"></div>
-          <img id="qr-image" class="hidden" alt="QR Code para captura de foto">
+          <img id="qr-image" class="hidden" alt="QR Code para envio de fotos">
         </div>
 
-        <div class="qr-actions">
-          <button type="button" id="btn-copy-link" class="btn btn-secondary btn-sm hidden">
-            Copiar link
-          </button>
-          <a id="open-mobile-link" href="#" class="btn btn-primary btn-sm hidden" target="_blank" rel="noopener">
-            Abrir no celular
-          </a>
+        <div class="action-row">
+          <button type="button" id="btn-copy-link" class="btn btn-outline btn-sm hidden">Copiar link</button>
+          <a id="open-mobile-link" href="#" class="btn btn-solid btn-sm hidden" target="_blank" rel="noopener">Abrir no celular</a>
         </div>
 
-        <div class="url-box">
-          <div class="url-label">Link de captura</div>
-          <div id="capture-url" class="url-value">—</div>
+        <div class="field-block">
+          <label class="field-label">Link de captura</label>
+          <div id="capture-url" class="field-value">—</div>
         </div>
 
-        <div class="url-box hidden" id="local-network-box">
-          <div class="url-label">Rede local (mesmo Wi-Fi)</div>
-          <div id="network-url" class="url-value">—</div>
+        <div class="field-block hidden" id="local-network-box">
+          <label class="field-label">Rede local (mesmo Wi-Fi)</label>
+          <div id="network-url" class="field-value">—</div>
         </div>
       </section>
 
-      <section class="card">
-        <h2 class="card-title">Como funciona</h2>
-        <p class="card-subtitle" id="instructions-subtitle">Passo a passo</p>
-        <ol class="instructions" id="instructions-list">
-          <li>
-            <span class="step-num">1</span>
-            <span>Escaneie o QR Code com a câmera do celular</span>
-          </li>
-          <li>
-            <span class="step-num">2</span>
-            <span>Permita o acesso à câmera</span>
-          </li>
-          <li>
-            <span class="step-num">3</span>
-            <span>Toque no botão redondo para fotografar</span>
-          </li>
-          <li>
-            <span class="step-num">4</span>
-            <span>Confira o preview e envie a foto</span>
-          </li>
-          <li>
-            <span class="step-num">5</span>
-            <span>Veja no painel <a href="/admin">Admin</a></span>
-          </li>
+      <section class="panel">
+        <h2 class="panel-title">Instruções</h2>
+        <p class="panel-lead" id="instructions-subtitle">Para os convidados</p>
+        <ol class="steps" id="instructions-list">
+          <li><span class="step-n">1</span><span>Escaneie o QR Code</span></li>
+          <li><span class="step-n">2</span><span>Permita o uso da câmera</span></li>
+          <li><span class="step-n">3</span><span>Tire a foto e confira o preview</span></li>
+          <li><span class="step-n">4</span><span>Envie a imagem</span></li>
+          <li><span class="step-n">5</span><span>As fotos aparecem na <a href="/admin">galeria</a></span></li>
         </ol>
       </section>
     </div>

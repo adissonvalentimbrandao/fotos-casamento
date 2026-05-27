@@ -3,32 +3,34 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta name="theme-color" content="#0a0a0f">
-  <title>Admin — Fotos Casamento</title>
+  <meta name="theme-color" content="#faf9f7">
+  <title>Galeria — Fotos do casamento</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/style.css">
 </head>
-<body data-page="admin">
+<body data-page="admin" class="page-light">
   <div class="app-shell">
     <header class="app-header">
-      <div class="logo">
-        <div class="logo-icon">🖼️</div>
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true"></span>
         <div>
-          <h1>Painel Admin</h1>
+          <h1>Galeria</h1>
           <p>Fotos enviadas pelos convidados</p>
         </div>
       </div>
       <nav class="nav-links">
-        <a href="/" class="btn btn-secondary btn-sm">Gerar QR Code</a>
-        <button type="button" id="btn-refresh-photos" class="btn btn-primary btn-sm">
-          Atualizar
-        </button>
+        <a href="/" class="btn btn-outline btn-sm">QR Code</a>
+        <button type="button" id="btn-download-zip" class="btn btn-outline btn-sm" disabled>Baixar ZIP</button>
+        <button type="button" id="btn-refresh-photos" class="btn btn-solid btn-sm">Atualizar</button>
       </nav>
     </header>
 
     <div class="stats-row">
       <div class="stat-card">
         <div class="stat-value" id="stat-total">0</div>
-        <div class="stat-label">Total de fotos</div>
+        <div class="stat-label">Total</div>
       </div>
       <div class="stat-card">
         <div class="stat-value" id="stat-today">0</div>
@@ -36,19 +38,32 @@
       </div>
     </div>
 
-    <section class="card">
-      <h2 class="card-title">Galeria de fotos</h2>
-      <p class="card-subtitle">Atualiza automaticamente ao clicar em Atualizar</p>
+    <section class="panel">
+      <h2 class="panel-title">Fotos</h2>
+      <p class="panel-lead">Clique para ampliar · use Baixar ZIP para salvar todas de uma vez</p>
 
       <div id="photos-container">
         <div class="empty-state" id="empty-state">
-          <div class="icon">📭</div>
-          <p>Nenhuma foto enviada ainda.</p>
-          <p class="mt-1">Gere um QR Code na página inicial.</p>
+          <p class="empty-title">Nenhuma foto ainda</p>
+          <p class="empty-desc">Gere um QR Code na página inicial para começar a receber imagens.</p>
         </div>
         <div class="photos-grid hidden" id="photos-grid"></div>
       </div>
     </section>
+  </div>
+
+  <div class="lightbox hidden" id="lightbox" role="dialog" aria-modal="true" aria-label="Visualização da foto">
+    <button type="button" class="lightbox-close" id="lightbox-close" aria-label="Fechar">×</button>
+    <button type="button" class="lightbox-nav lightbox-prev" id="lightbox-prev" aria-label="Foto anterior">‹</button>
+    <button type="button" class="lightbox-nav lightbox-next" id="lightbox-next" aria-label="Próxima foto">›</button>
+    <div class="lightbox-body">
+      <img id="lightbox-img" src="" alt="">
+      <div class="lightbox-meta">
+        <span id="lightbox-id"></span>
+        <span id="lightbox-date"></span>
+        <a id="lightbox-download" class="lightbox-download" href="#" download>Baixar esta foto</a>
+      </div>
+    </div>
   </div>
 
   <script src="/app.js"></script>

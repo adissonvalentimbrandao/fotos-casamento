@@ -101,17 +101,17 @@ async function initHome() {
       captureUrlEl.textContent = session.captureUrl;
 
       if (isOnline) {
-        networkBadge.textContent = 'Online — qualquer celular com internet';
-        networkBadge.classList.add('badge-online');
-        qrSubtitle.textContent = 'Escaneie de qualquer lugar, sem Wi-Fi local';
-        instructionsSubtitle.textContent = 'Funciona em 4G/5G ou Wi-Fi';
+        networkBadge.textContent = 'Disponível na internet';
+        networkBadge.classList.add('is-online');
+        qrSubtitle.textContent = 'Qualquer convidado pode escanear e enviar';
+        instructionsSubtitle.textContent = 'Sem necessidade de mesma rede Wi-Fi';
         localNetworkBox.classList.add('hidden');
         openMobileLink.href = session.captureUrl;
       } else {
-        networkBadge.textContent = `Rede local: ${network.ip}:${network.port}`;
-        networkBadge.classList.remove('badge-online');
-        qrSubtitle.textContent = 'Celular e PC na mesma rede Wi-Fi';
-        instructionsSubtitle.textContent = 'Mesma rede Wi-Fi obrigatória';
+        networkBadge.textContent = `Rede local · ${network.ip}`;
+        networkBadge.classList.remove('is-online');
+        qrSubtitle.textContent = 'Celular e computador na mesma rede Wi-Fi';
+        instructionsSubtitle.textContent = 'Conexão local';
         networkUrlEl.textContent = networkCaptureUrl;
         localNetworkBox.classList.remove('hidden');
         openMobileLink.href = networkCaptureUrl;
@@ -304,19 +304,76 @@ async function initAdmin() {
   const statTotal = document.getElementById('stat-total');
   const statToday = document.getElementById('stat-today');
   const btnRefresh = document.getElementById('btn-refresh-photos');
+  const btnDownloadZip = document.getElementById('btn-download-zip');
+  const lightbox = document.getElementById('lightbox');
+  const lightboxImg = document.getElementById('lightbox-img');
+  const lightboxId = document.getElementById('lightbox-id');
+  const lightboxDate = document.getElementById('lightbox-date');
+  const lightboxClose = document.getElementById('lightbox-close');
+  const lightboxPrev = document.getElementById('lightbox-prev');
+  const lightboxNext = document.getElementById('lightbox-next');
+  const lightboxDownload = document.getElementById('lightbox-download');
+
+  let photosList = [];
+  let lightboxIndex = 0;
+
+  function openLightbox(index) {
+    if (!photosList.length) return;
+    lightboxIndex = index;
+    const photo = photosList[lightboxIndex];
+    lightboxImg.src = photo.image_path;
+    lightboxImg.alt = `Foto ${photo.id}`;
+    lightboxId.textContent = `Foto ${photo.id}`;
+    lightboxDate.textContent = formatDate(photo.created_at);
+    const ext = photo.image_path.match(/\.\w+$/)?.[0] || '.jpg';
+    lightboxDownload.href = photo.image_path;
+    lightboxDownload.download = `foto-${String(photo.id).padStart(4, '0')}${ext}`;
+    lightboxPrev.disabled = lightboxIndex === 0;
+    lightboxNext.disabled = lightboxIndex === photosList.length - 1;
+    lightbox.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeLightbox() {
+    lightbox.classList.add('hidden');
+    lightboxImg.src = '';
+    document.body.style.overflow = '';
+  }
+
+  function stepLightbox(delta) {
+    const next = lightboxIndex + delta;
+    if (next < 0 || next >= photosList.length) return;
+    openLightbox(next);
+  }
+
+  lightboxClose.addEventListener('click', closeLightbox);
+  lightbox.addEventListener('click', (e) => {
+    if (e.target === lightbox) closeLightbox();
+  });
+  lightboxPrev.addEventListener('click', () => stepLightbox(-1));
+  lightboxNext.addEventListener('click', () => stepLightbox(1));
+
+  document.addEventListener('keydown', (e) => {
+    if (lightbox.classList.contains('hidden')) return;
+    if (e.key === 'Escape') closeLightbox();
+    if (e.key === 'ArrowLeft') stepLightbox(-1);
+    if (e.key === 'ArrowRight') stepLightbox(1);
+  });
 
   async function loadPhotos() {
     try {
       const res = await fetch('/api/photos');
       if (!res.ok) throw new Error('Erro ao carregar fotos');
-      const photos = await res.json();
+      photosList = await res.json();
 
-      statTotal.textContent = photos.length;
-      statToday.textContent = photos.filter((p) => isToday(p.created_at)).length;
+      statTotal.textContent = photosList.length;
+      statToday.textContent = photosList.filter((p) => isToday(p.created_at)).length;
 
       photosGrid.innerHTML = '';
 
-      if (photos.length === 0) {
+      btnDownloadZip.disabled = photosList.length === 0;
+
+      if (photosList.length === 0) {
         emptyState.classList.remove('hidden');
         photosGrid.classList.add('hidden');
         return;
@@ -325,22 +382,59 @@ async function initAdmin() {
       emptyState.classList.add('hidden');
       photosGrid.classList.remove('hidden');
 
-      photos.forEach((photo) => {
-        const card = document.createElement('article');
+      photosList.forEach((photo, index) => {
+        const card = document.createElement('button');
+        card.type = 'button';
         card.className = 'photo-card';
         card.innerHTML = `
-          <img class="photo-thumb" src="${photo.image_path}" alt="Foto ${photo.id}" loading="lazy">
+          <div class="photo-thumb-wrap">
+            <img class="photo-thumb" src="${photo.image_path}" alt="Foto ${photo.id}" loading="lazy">
+          </div>
           <div class="photo-info">
-            <div class="photo-token">#${photo.id}</div>
+            <div class="photo-id">Foto ${photo.id}</div>
             <div class="photo-date">${formatDate(photo.created_at)}</div>
           </div>
         `;
+        card.addEventListener('click', () => openLightbox(index));
         photosGrid.appendChild(card);
       });
     } catch {
-      statTotal.textContent = '!';
+      statTotal.textContent = '—';
+      btnDownloadZip.disabled = true;
     }
   }
+
+  btnDownloadZip.addEventListener('click', async () => {
+    if (!photosList.length) return;
+
+    const label = btnDownloadZip.textContent;
+    btnDownloadZip.disabled = true;
+    btnDownloadZip.textContent = 'Preparando...';
+
+    try {
+      const res = await fetch('/api/photos/download');
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || 'Não foi possível gerar o ZIP');
+      }
+
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      const date = new Date().toISOString().slice(0, 10);
+      a.href = url;
+      a.download = `fotos-casamento-${date}.zip`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      alert(err.message || 'Erro ao baixar as fotos.');
+    } finally {
+      btnDownloadZip.textContent = label;
+      btnDownloadZip.disabled = photosList.length === 0;
+    }
+  });
 
   btnRefresh.addEventListener('click', loadPhotos);
   loadPhotos();
