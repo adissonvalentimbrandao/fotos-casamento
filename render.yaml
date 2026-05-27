@@ -1,23 +1,17 @@
 services:
   - type: web
     name: fotos-casamento
-    runtime: node
+    runtime: docker
     plan: free
-    buildCommand: npm install
-    startCommand: npm start
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
     healthCheckPath: /health
     envVars:
       - key: NODE_ENV
         value: production
-      - key: NODE_VERSION
-        value: 20.18.0
-      # Só preencha se usar domínio customizado (DNS próprio na Render)
-      # A Render já define RENDER_EXTERNAL_URL automaticamente para *.onrender.com
-      - key: PUBLIC_URL
-        sync: false
-    # Recomendado: disco para não perder fotos ao reiniciar
+    # Disco persistente (planos pagos na Render):
     # disk:
     #   name: fotos-data
     #   mountPath: /var/data
     #   sizeGB: 1
-    # Depois adicione no painel: DATA_DIR = /var/data
+    # + env: DATA_DIR=/var/data

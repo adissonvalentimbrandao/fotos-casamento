@@ -16,40 +16,51 @@ No celular (mesma Wi-Fi): use o IP exibido no terminal ou escaneie o QR Code.
 
 ---
 
-## Deploy na Render
+## Docker (local)
 
-### Opção A — Blueprint (recomendado)
+```bash
+docker build -t fotos-casamento .
+docker run -p 3000:3000 fotos-casamento
+```
 
-1. Faça push do projeto para o GitHub.
-2. Acesse [render.com](https://render.com) → **New** → **Blueprint**.
-3. Conecte o repositório — o `render.yaml` já está configurado.
-4. Clique em **Apply**.
+Acesse `http://localhost:3000`.
 
-### Opção B — Manual
+---
 
-1. **New** → **Web Service** → conecte o repositório.
-2. Configurações:
-   - **Runtime:** Node
-   - **Build Command:** `npm install`
-   - **Start Command:** `npm start`
-   - **Health Check Path:** `/health`
-3. Variáveis de ambiente (opcional):
+## Deploy na Render (Docker)
+
+O projeto usa **Dockerfile** + `render.yaml` com disco persistente.
+
+### Blueprint (recomendado)
+
+1. Push no GitHub: `adissonvalentimbrandao/fotos-casamento`
+2. [render.com](https://render.com) → **New** → **Blueprint**
+3. Conecte o repo → **Apply**
+
+### Manual
+
+1. **New** → **Web Service** → repo do GitHub
+2. **Environment:** Docker
+3. **Dockerfile Path:** `./Dockerfile`
+4. **Health Check Path:** `/health`
+5. **Disk:** mount `/var/data` (1 GB)
+6. **Environment variables:**
    - `NODE_ENV` = `production`
-4. Deploy.
+   - `DATA_DIR` = `/var/data`
+7. Deploy
 
-Após o deploy, a URL será algo como `https://fotos-casamento.onrender.com`.
+URL pública: `https://fotos-casamento.onrender.com` (ou o nome que você escolher na Render).
 
-### HTTPS e câmera
+A Render injeta `RENDER_EXTERNAL_URL` automaticamente — o QR Code usa essa URL com HTTPS. **Não precisa** configurar DNS nem `PUBLIC_URL` manualmente.
 
-Na Render o site já sai com **HTTPS** — a câmera funciona no celular sem configuração extra. O QR Code aponta automaticamente para a URL pública.
+### Envs na Render
 
-### Persistir fotos (importante)
-
-No plano free, arquivos somem ao reiniciar o serviço. Para manter fotos e banco:
-
-1. No painel da Render: **Disks** → Add Disk (1 GB) em `/var/data`
-2. Adicione a variável: `DATA_DIR` = `/var/data`
-3. Faça redeploy.
+| Variável | Valor | Quem define |
+|----------|-------|-------------|
+| `NODE_ENV` | `production` | `render.yaml` |
+| `DATA_DIR` | `/var/data` | `render.yaml` |
+| `PORT` | (auto) | Render |
+| `RENDER_EXTERNAL_URL` | `https://....onrender.com` | Render (auto) |
 
 ---
 
@@ -80,30 +91,4 @@ public/
 
 ## Variáveis de ambiente
 
-Veja `.env.example` para referência.
-
-| Variável | Obrigatória? | Quem define | Descrição |
-|----------|--------------|-------------|-----------|
-| `PORT` | Não | Render (auto) | Porta do servidor |
-| `NODE_ENV` | Sim (prod) | Você / `render.yaml` | Use `production` na Render |
-| `RENDER_EXTERNAL_URL` | Não | **Render (auto)** | URL `https://xxx.onrender.com` — QR Code usa isso |
-| `PUBLIC_URL` | Só com DNS próprio | Você (painel) | Ex: `https://fotos.seudominio.com.br` — sobrescreve a URL do QR |
-| `DATA_DIR` | Recomendado | Você (painel) | Ex: `/var/data` com disco persistente |
-
-### DNS / URL do QR Code
-
-**URL padrão `*.onrender.com`:** não precisa configurar nada. A Render injeta `RENDER_EXTERNAL_URL` e o QR Code já sai certo com HTTPS.
-
-**Domínio customizado** (ex: `fotos.casamento.com.br`):
-
-1. Na Render: **Settings** → **Custom Domains** → adicione o domínio e configure o DNS (CNAME).
-2. No painel: **Environment** → adicione:
-   ```
-   PUBLIC_URL=https://fotos.casamento.com.br
-   ```
-   (sem barra no final)
-3. Redeploy.
-
-O app prioriza: `PUBLIC_URL` → `RENDER_EXTERNAL_URL` → headers da requisição.
-
-**Não defina** `RENDER_EXTERNAL_URL` manualmente no painel — a Render cuida disso.
+Veja `.env.example`. Na Render com Docker, o essencial já está no `render.yaml`.
