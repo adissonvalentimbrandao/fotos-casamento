@@ -125,7 +125,7 @@ app.get('/api/session', async (req, res) => {
     const qrDataUrl = await QRCode.toDataURL(captureUrl, {
       width: 320,
       margin: 2,
-      color: { dark: '#1c1917', light: '#ffffff' },
+      color: { dark: '#111b21', light: '#ffffff' },
     });
 
     res.json({ token, captureUrl, qrDataUrl, baseUrl });

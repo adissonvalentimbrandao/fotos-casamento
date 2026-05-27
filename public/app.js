@@ -8,13 +8,15 @@ function hideEl(el) {
   if (el) el.classList.add('d-none');
 }
 
-function showToast(el, message) {
+function showToast(el, message, isError = false) {
   if (!el) return;
   if (message) el.textContent = message;
+  el.classList.toggle('error', isError);
   showEl(el);
 }
 
 function hideToast(el) {
+  if (el) el.classList.remove('error');
   hideEl(el);
 }
 
@@ -58,7 +60,7 @@ async function copyText(text) {
 function setBadge(el, text, online) {
   if (!el) return;
   el.textContent = text;
-  el.className = `badge ${online ? 'text-bg-success' : 'text-bg-secondary'}`;
+  el.className = `wa-badge${online ? ' online' : ''}`;
 }
 
 /* ---------- HOME ---------- */
@@ -130,7 +132,7 @@ async function initHome() {
   btnCopyLink.addEventListener('click', async () => {
     if (!lastCaptureUrl) return;
     const ok = await copyText(lastCaptureUrl);
-    btnCopyLink.textContent = ok ? 'Copiado!' : 'Erro ao copiar';
+    btnCopyLink.textContent = ok ? 'Link copiado' : 'Não foi possível copiar';
     setTimeout(() => {
       btnCopyLink.textContent = 'Copiar link';
     }, 2000);
@@ -158,7 +160,7 @@ async function initCapture() {
   const successScreen = document.getElementById('success-screen');
 
   if (!token) {
-    showToast(toastError, 'Link inválido. Escaneie o QR Code novamente.');
+    showToast(toastError, 'Link inválido. Escaneie o QR Code novamente.', true);
     return;
   }
 
@@ -168,7 +170,7 @@ async function initCapture() {
   async function checkCamera() {
     if (!navigator.mediaDevices?.getUserMedia) {
       hideToast(toastCamera);
-      showToast(toastError, 'Navegador sem suporte à câmera. Use Chrome ou Safari.');
+      showToast(toastError, 'Navegador sem suporte à câmera. Use Chrome ou Safari.', true);
       return false;
     }
     return true;
@@ -203,7 +205,7 @@ async function initCapture() {
       } else if (err.name === 'NotFoundError') {
         msg = 'Nenhuma câmera encontrada neste aparelho.';
       }
-      showToast(toastError, msg);
+      showToast(toastError, msg, true);
     }
   }
 
@@ -262,7 +264,7 @@ async function initCapture() {
 
   btnUpload.addEventListener('click', async () => {
     if (!capturedBlob) {
-      showToast(toastError, 'Tire uma foto antes de enviar.');
+      showToast(toastError, 'Tire uma foto antes de enviar.', true);
       return;
     }
 
@@ -283,10 +285,9 @@ async function initCapture() {
 
       hideEl(dockPreview);
       successScreen.classList.remove('d-none');
-      successScreen.classList.add('d-flex');
       document.body.classList.add('upload-done');
     } catch (err) {
-      showToast(toastError, err.message || 'Falha no envio. Tente de novo.');
+      showToast(toastError, err.message || 'Falha no envio. Tente de novo.', true);
       btnUpload.disabled = false;
     } finally {
       loadingOverlay.classList.remove('show');
@@ -374,21 +375,12 @@ async function initAdmin() {
       showEl(photosGrid);
 
       photosList.forEach((photo, index) => {
-        const col = document.createElement('div');
-        col.className = 'col';
-        col.innerHTML = `
-          <button type="button" class="photo-card-btn">
-            <div class="card shadow-sm h-100">
-              <img src="${photo.image_path}" class="card-img-top" alt="Foto ${photo.id}" loading="lazy">
-              <div class="card-body py-2 px-2">
-                <div class="small fw-semibold">Foto ${photo.id}</div>
-                <div class="text-muted" style="font-size: 0.7rem;">${formatDate(photo.created_at)}</div>
-              </div>
-            </div>
-          </button>
-        `;
-        col.querySelector('.photo-card-btn').addEventListener('click', () => openLightbox(index));
-        photosGrid.appendChild(col);
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'wa-photo-item';
+        btn.innerHTML = `<img src="${photo.image_path}" alt="Foto ${photo.id}" loading="lazy">`;
+        btn.addEventListener('click', () => openLightbox(index));
+        photosGrid.appendChild(btn);
       });
     } catch {
       statTotal.textContent = '—';
@@ -401,7 +393,7 @@ async function initAdmin() {
 
     const label = btnDownloadZip.textContent;
     btnDownloadZip.disabled = true;
-    btnDownloadZip.textContent = 'Preparando...';
+    btnDownloadZip.textContent = 'Preparando download...';
 
     try {
       const res = await fetch('/api/photos/download');

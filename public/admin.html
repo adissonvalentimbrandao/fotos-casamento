@@ -3,78 +3,76 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta name="theme-color" content="#212529">
+  <meta name="theme-color" content="#202c33">
   <title>Galeria — Fotos do casamento</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="/style.css">
 </head>
-<body data-page="admin" class="bg-light">
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark border-bottom">
-    <div class="container">
-      <a class="navbar-brand fw-semibold" href="/admin">Galeria</a>
-      <div class="d-flex flex-wrap gap-2">
-        <a href="/" class="btn btn-outline-light btn-sm">QR Code</a>
-        <button type="button" id="btn-download-zip" class="btn btn-outline-light btn-sm" disabled>Baixar ZIP</button>
-        <button type="button" id="btn-refresh-photos" class="btn btn-primary btn-sm">Atualizar</button>
+<body data-page="admin">
+  <div class="wa-app">
+    <header class="wa-header">
+      <div class="wa-header-main">
+        <div class="wa-avatar" aria-hidden="true">GL</div>
+        <div>
+          <h1>Galeria</h1>
+          <p>Fotos dos convidados</p>
+        </div>
       </div>
-    </div>
-  </nav>
+      <div class="wa-header-actions">
+        <a href="/" class="wa-btn wa-btn-ghost btn-sm">Voltar ao QR Code</a>
+        <button type="button" id="btn-download-zip" class="wa-btn wa-btn-ghost btn-sm" disabled>Baixar todas (ZIP)</button>
+        <button type="button" id="btn-refresh-photos" class="wa-btn wa-btn-green btn-sm">Atualizar galeria</button>
+      </div>
+    </header>
 
-  <main class="container py-4 py-lg-5">
-    <div class="row g-3 mb-4">
-      <div class="col-6 col-md-3">
-        <div class="card shadow-sm text-center">
-          <div class="card-body py-3">
-            <div class="display-6 fw-bold mb-0" id="stat-total">0</div>
-            <div class="text-muted small">Total</div>
+    <main class="wa-content">
+      <div class="wa-stats">
+        <div class="wa-stat">
+          <strong id="stat-total">0</strong>
+          <span>Total</span>
+        </div>
+        <div class="wa-stat">
+          <strong id="stat-today">0</strong>
+          <span>Hoje</span>
+        </div>
+      </div>
+
+      <section class="wa-panel">
+        <div class="wa-panel-head">
+          <h2>Mídia</h2>
+          <p>Toque na foto para ampliar</p>
+        </div>
+        <div class="wa-panel-body" style="padding: 4px;">
+          <div id="empty-state" class="wa-empty">
+            <h3>Nenhuma foto ainda</h3>
+            <p>Gere um QR Code na página inicial.</p>
           </div>
+          <div class="wa-photos-grid d-none" id="photos-grid"></div>
         </div>
-      </div>
-      <div class="col-6 col-md-3">
-        <div class="card shadow-sm text-center">
-          <div class="card-body py-3">
-            <div class="display-6 fw-bold mb-0" id="stat-today">0</div>
-            <div class="text-muted small">Hoje</div>
-          </div>
-        </div>
-      </div>
-    </div>
+      </section>
+    </main>
+  </div>
 
-    <div class="card shadow-sm">
-      <div class="card-body">
-        <h2 class="h5 card-title">Fotos</h2>
-        <p class="text-muted small mb-4">Clique na miniatura para ampliar. Use Baixar ZIP para todas de uma vez.</p>
-
-        <div id="empty-state" class="text-center py-5 text-muted">
-          <p class="fw-semibold text-dark mb-1">Nenhuma foto ainda</p>
-          <p class="small mb-0">Gere um QR Code na página inicial.</p>
-        </div>
-
-        <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-5 g-3 d-none" id="photos-grid"></div>
-      </div>
-    </div>
-  </main>
-
-  <div class="modal fade" id="photoModal" tabindex="-1" aria-labelledby="photoModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-xl">
-      <div class="modal-content bg-dark text-white border-0">
-        <div class="modal-header border-secondary">
-          <h5 class="modal-title" id="photoModalLabel">Foto</h5>
+  <div class="modal fade wa-modal" id="photoModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-fullscreen">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title text-light fw-normal" id="photoModalLabel">Foto</h5>
           <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
         </div>
-        <div class="modal-body text-center p-2 p-md-3">
-          <img id="lightbox-img" src="" alt="" class="img-fluid rounded" style="max-height: 75vh; object-fit: contain;">
+        <div class="modal-body">
+          <img id="lightbox-img" src="" alt="">
         </div>
-        <div class="modal-footer border-secondary justify-content-between flex-wrap gap-2">
-          <div class="small text-white-50">
+        <div class="modal-footer justify-content-between flex-wrap gap-2">
+          <div class="small text-secondary">
             <span id="lightbox-id"></span>
             <span class="mx-2">·</span>
             <span id="lightbox-date"></span>
           </div>
-          <div class="d-flex gap-2">
-            <button type="button" class="btn btn-outline-light btn-sm" id="lightbox-prev">Anterior</button>
-            <button type="button" class="btn btn-outline-light btn-sm" id="lightbox-next">Próxima</button>
-            <a id="lightbox-download" class="btn btn-primary btn-sm" href="#" download>Baixar</a>
+          <div class="d-flex gap-2 flex-wrap">
+            <button type="button" class="wa-btn wa-btn-ghost" id="lightbox-prev">Foto anterior</button>
+            <button type="button" class="wa-btn wa-btn-ghost" id="lightbox-next">Próxima foto</button>
+            <a id="lightbox-download" class="wa-btn wa-btn-green" href="#" download>Baixar esta foto</a>
           </div>
         </div>
       </div>
