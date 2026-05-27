@@ -481,23 +481,46 @@ a:hover { text-decoration: underline; }
 .page-capture {
   background: #000 !important;
   overflow: hidden;
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: var(--app-height, 100dvh);
+  height: var(--app-height, 100svh);
+  overscroll-behavior: none;
 }
 
 .page-capture .wa-header {
   background: var(--wa-header-deeper);
+  flex-shrink: 0;
+  padding: calc(8px + var(--safe-top)) 12px 8px;
+}
+
+.page-capture .wa-header h1 {
+  font-size: 0.9375rem;
+}
+
+.page-capture .wa-header p {
+  font-size: 0.7rem;
+}
+
+.page-capture .wa-avatar {
+  width: 36px;
+  height: 36px;
+  font-size: 1rem;
 }
 
 .capture-app {
-  display: flex;
-  flex-direction: column;
-  height: 100dvh;
-  height: 100vh;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  height: 100%;
+  max-height: 100%;
+  overflow: hidden;
 }
 
 .capture-stage {
-  flex: 1;
   position: relative;
   min-height: 0;
+  overflow: hidden;
   background: #000;
 }
 
@@ -528,34 +551,59 @@ a:hover { text-decoration: underline; }
 
 .preview-mode .camera-frame { display: none !important; }
 
-.capture-dock {
+.capture-dock-area {
   flex-shrink: 0;
-  padding: 16px;
-  padding-bottom: calc(16px + var(--safe-bottom));
+  background: #0b141a;
+  border-top: 1px solid var(--wa-border);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  z-index: 10;
+}
+
+.capture-dock {
+  padding: 10px 12px;
   display: flex;
   justify-content: center;
   align-items: center;
-  background: linear-gradient(transparent, rgba(0,0,0,0.85));
-  position: relative;
-  z-index: 10;
+  box-sizing: border-box;
+  min-height: 84px;
+}
+
+.capture-dock.d-none {
+  display: none !important;
 }
 
 .capture-dock-preview:not(.d-none) {
   display: flex;
-  gap: 10px;
+  gap: 8px;
   justify-content: center;
+  align-items: center;
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+  padding-left: 4px;
+  padding-right: 4px;
 }
 
 .capture-dock-preview .wa-btn {
-  flex: 1;
-  max-width: 160px;
-  padding: 12px 20px;
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: none;
+  padding: 11px 10px;
   border-radius: 24px;
+  font-size: 0.8125rem;
+  white-space: nowrap;
+}
+
+@media (max-width: 380px) {
+  .capture-dock-preview .wa-btn {
+    font-size: 0.75rem;
+    padding: 10px 8px;
+  }
 }
 
 .shutter-btn {
-  width: 68px;
-  height: 68px;
+  width: 64px;
+  height: 64px;
   border-radius: 50%;
   border: 4px solid #fff;
   background: transparent;
@@ -667,7 +715,7 @@ a:hover { text-decoration: underline; }
 
 @keyframes spin { to { transform: rotate(360deg); } }
 
-.upload-done .capture-dock,
+.upload-done .capture-dock-area,
 .upload-done .wa-header,
 .upload-done .capture-stage { visibility: hidden; }
 

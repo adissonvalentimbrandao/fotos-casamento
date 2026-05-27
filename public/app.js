@@ -143,7 +143,21 @@ async function initHome() {
 }
 
 /* ---------- CAPTURE ---------- */
+function fitCaptureViewport() {
+  const setHeight = () => {
+    const h = window.visualViewport?.height ?? window.innerHeight;
+    document.documentElement.style.setProperty('--app-height', `${Math.round(h)}px`);
+  };
+  setHeight();
+  window.addEventListener('resize', setHeight);
+  window.visualViewport?.addEventListener('resize', setHeight);
+  window.visualViewport?.addEventListener('scroll', setHeight);
+}
+
+/* ---------- CAPTURE ---------- */
 async function initCapture() {
+  fitCaptureViewport();
+
   const token = window.location.pathname.split('/capture/')[1]?.split('/')[0];
   const video = document.getElementById('video');
   const canvas = document.getElementById('canvas');
