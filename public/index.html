@@ -3,71 +3,76 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta name="theme-color" content="#faf9f7">
+  <meta name="theme-color" content="#212529">
   <title>Fotos do casamento</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="/style.css">
 </head>
-<body data-page="home" class="page-light">
-  <div class="app-shell">
-    <header class="app-header">
-      <div class="brand">
-        <span class="brand-mark" aria-hidden="true"></span>
-        <div>
-          <h1>Fotos do casamento</h1>
-          <p>Compartilhe um momento pelo celular</p>
+<body data-page="home" class="bg-light">
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark border-bottom">
+    <div class="container">
+      <a class="navbar-brand fw-semibold" href="/">Fotos do casamento</a>
+      <div class="d-flex gap-2">
+        <a href="/admin" class="btn btn-outline-light btn-sm">Galeria</a>
+        <button type="button" id="btn-refresh" class="btn btn-primary btn-sm">Novo QR Code</button>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container py-4 py-lg-5">
+    <div class="row g-4">
+      <div class="col-lg-6">
+        <div class="card shadow-sm h-100">
+          <div class="card-body text-center">
+            <h2 class="card-title h5">QR Code</h2>
+            <p class="text-muted small mb-3" id="qr-subtitle">Escaneie com a câmera do celular</p>
+
+            <span class="badge mb-3" id="network-badge">Carregando...</span>
+
+            <div class="bg-white border rounded p-3 d-inline-block mb-3" id="qr-wrapper">
+              <div class="spinner-border text-secondary" id="qr-loading" role="status">
+                <span class="visually-hidden">Carregando...</span>
+              </div>
+              <img id="qr-image" class="img-fluid d-none" alt="QR Code" style="max-width: 260px;">
+            </div>
+
+            <div class="d-flex flex-wrap justify-content-center gap-2 mb-3">
+              <button type="button" id="btn-copy-link" class="btn btn-outline-secondary btn-sm d-none">Copiar link</button>
+              <a id="open-mobile-link" href="#" class="btn btn-primary btn-sm d-none" target="_blank" rel="noopener">Abrir no celular</a>
+            </div>
+
+            <div class="text-start">
+              <label class="form-label small text-muted mb-1">Link de captura</label>
+              <div id="capture-url" class="small text-break font-monospace bg-light border rounded p-2">—</div>
+            </div>
+
+            <div class="text-start mt-3 d-none" id="local-network-box">
+              <label class="form-label small text-muted mb-1">Rede local (mesmo Wi-Fi)</label>
+              <div id="network-url" class="small text-break font-monospace bg-light border rounded p-2">—</div>
+            </div>
+          </div>
         </div>
       </div>
-      <nav class="nav-links">
-        <a href="/admin" class="btn btn-outline btn-sm">Galeria</a>
-        <button type="button" id="btn-refresh" class="btn btn-solid btn-sm">Novo QR Code</button>
-      </nav>
-    </header>
 
-    <div class="grid-2">
-      <section class="panel qr-section">
-        <h2 class="panel-title">QR Code</h2>
-        <p class="panel-lead" id="qr-subtitle">Escaneie com a câmera do celular</p>
-
-        <p class="status-pill" id="network-badge">Carregando...</p>
-
-        <div class="qr-frame" id="qr-wrapper">
-          <div class="spinner" id="qr-loading"></div>
-          <img id="qr-image" class="hidden" alt="QR Code para envio de fotos">
+      <div class="col-lg-6">
+        <div class="card shadow-sm h-100">
+          <div class="card-body">
+            <h2 class="card-title h5">Instruções</h2>
+            <p class="text-muted small mb-3" id="instructions-subtitle">Para os convidados</p>
+            <ol class="list-group list-group-numbered list-group-flush" id="instructions-list">
+              <li class="list-group-item bg-transparent border-0 px-0">Escaneie o QR Code</li>
+              <li class="list-group-item bg-transparent border-0 px-0">Permita o uso da câmera</li>
+              <li class="list-group-item bg-transparent border-0 px-0">Tire a foto e confira o preview</li>
+              <li class="list-group-item bg-transparent border-0 px-0">Envie a imagem</li>
+              <li class="list-group-item bg-transparent border-0 px-0">Veja na <a href="/admin">galeria</a></li>
+            </ol>
+          </div>
         </div>
-
-        <div class="action-row">
-          <button type="button" id="btn-copy-link" class="btn btn-outline btn-sm hidden">Copiar link</button>
-          <a id="open-mobile-link" href="#" class="btn btn-solid btn-sm hidden" target="_blank" rel="noopener">Abrir no celular</a>
-        </div>
-
-        <div class="field-block">
-          <label class="field-label">Link de captura</label>
-          <div id="capture-url" class="field-value">—</div>
-        </div>
-
-        <div class="field-block hidden" id="local-network-box">
-          <label class="field-label">Rede local (mesmo Wi-Fi)</label>
-          <div id="network-url" class="field-value">—</div>
-        </div>
-      </section>
-
-      <section class="panel">
-        <h2 class="panel-title">Instruções</h2>
-        <p class="panel-lead" id="instructions-subtitle">Para os convidados</p>
-        <ol class="steps" id="instructions-list">
-          <li><span class="step-n">1</span><span>Escaneie o QR Code</span></li>
-          <li><span class="step-n">2</span><span>Permita o uso da câmera</span></li>
-          <li><span class="step-n">3</span><span>Tire a foto e confira o preview</span></li>
-          <li><span class="step-n">4</span><span>Envie a imagem</span></li>
-          <li><span class="step-n">5</span><span>As fotos aparecem na <a href="/admin">galeria</a></span></li>
-        </ol>
-      </section>
+      </div>
     </div>
-  </div>
+  </main>
 
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script src="/app.js"></script>
 </body>
 </html>

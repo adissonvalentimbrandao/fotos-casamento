@@ -3,61 +3,61 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <meta name="theme-color" content="#111111">
+  <meta name="theme-color" content="#000000">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>Enviar foto</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="/style.css">
 </head>
-<body data-page="capture" class="page-capture">
-  <div class="capture-app">
-    <header class="capture-topbar">
-      <p class="capture-title">Enviar foto</p>
-      <p class="capture-subtitle">Toque no círculo para capturar</p>
+<body data-page="capture" class="page-capture bg-black">
+  <div class="capture-app d-flex flex-column vh-100">
+    <header class="text-center text-white py-3 px-3 capture-safe-top">
+      <h1 class="h6 mb-0 text-uppercase letter-spacing">Enviar foto</h1>
+      <p class="small text-white-50 mb-0">Toque no círculo para capturar</p>
     </header>
 
-    <div id="toast-camera" class="capture-toast">Abrindo câmera...</div>
-    <div id="toast-error" class="capture-toast capture-toast-error hidden"></div>
+    <div id="toast-camera" class="alert alert-secondary py-2 px-3 capture-toast">Abrindo câmera...</div>
+    <div id="toast-error" class="alert alert-danger py-2 px-3 capture-toast d-none" role="alert"></div>
 
-    <main class="capture-stage">
-      <div class="camera-viewport" id="camera-viewport">
-        <video id="video" autoplay playsinline muted></video>
-        <canvas id="canvas" class="hidden"></canvas>
-        <img id="preview" class="preview-img hidden" alt="Pré-visualização">
-        <div class="camera-frame" id="camera-frame" aria-hidden="true"></div>
+    <main class="flex-grow-1 position-relative overflow-hidden">
+      <div class="camera-viewport position-absolute top-0 start-0 w-100 h-100">
+        <video id="video" class="w-100 h-100" style="object-fit: cover;" autoplay playsinline muted></video>
+        <canvas id="canvas" class="d-none"></canvas>
+        <img id="preview" class="preview-img position-absolute top-0 start-0 w-100 h-100 d-none" style="object-fit: cover;" alt="Pré-visualização">
+        <div class="camera-frame position-absolute" id="camera-frame" aria-hidden="true"></div>
       </div>
     </main>
 
-    <footer class="capture-dock" id="dock-camera">
+    <footer class="capture-dock text-center py-4 capture-safe-bottom" id="dock-camera">
       <button type="button" id="btn-shutter" class="shutter-btn" disabled aria-label="Tirar foto">
         <span class="shutter-inner"></span>
       </button>
     </footer>
 
-    <footer class="capture-dock capture-dock-preview hidden" id="dock-preview">
-      <div class="dock-actions">
-        <button type="button" id="btn-retake" class="btn-capture btn-capture-muted">Tirar outra</button>
-        <button type="button" id="btn-upload" class="btn-capture btn-capture-primary">Enviar foto</button>
+    <footer class="capture-dock py-3 px-3 capture-safe-bottom d-none" id="dock-preview">
+      <div class="d-flex gap-2 max-width mx-auto" style="max-width: 360px;">
+        <button type="button" id="btn-retake" class="btn btn-outline-light flex-fill">Tirar outra</button>
+        <button type="button" id="btn-upload" class="btn btn-light flex-fill fw-semibold">Enviar foto</button>
       </div>
     </footer>
 
-    <div class="success-screen hidden" id="success-screen">
-      <div class="success-card">
-        <p class="success-label">Enviado</p>
-        <h2>Obrigado</h2>
-        <p>Sua foto foi recebida.</p>
+    <div class="success-screen position-fixed top-0 start-0 w-100 h-100 d-none align-items-center justify-content-center bg-black" id="success-screen">
+      <div class="text-center text-white px-4">
+        <p class="text-uppercase small text-white-50 mb-2">Enviado</p>
+        <h2 class="h3 mb-2">Obrigado</h2>
+        <p class="text-white-50 mb-0">Sua foto foi recebida.</p>
       </div>
     </div>
   </div>
 
-  <div class="loading-overlay" id="loading-overlay">
-    <div class="spinner"></div>
-    <p class="loading-text">Enviando...</p>
+  <div class="loading-overlay position-fixed top-0 start-0 w-100 h-100 d-none flex-column justify-content-center bg-dark bg-opacity-75" id="loading-overlay">
+    <div class="text-center text-white">
+      <div class="spinner-border mb-2" role="status"></div>
+      <p class="small mb-0">Enviando...</p>
+    </div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <script src="/app.js"></script>
 </body>
 </html>

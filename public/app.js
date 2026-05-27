@@ -1,23 +1,21 @@
 const page = document.body.dataset.page;
 
-function showAlert(el, message) {
-  if (!el) return;
-  if (message) el.textContent = message;
-  el.classList.add('visible');
+function showEl(el) {
+  if (el) el.classList.remove('d-none');
 }
 
-function hideAlert(el) {
-  if (el) el.classList.remove('visible');
+function hideEl(el) {
+  if (el) el.classList.add('d-none');
 }
 
 function showToast(el, message) {
   if (!el) return;
   if (message) el.textContent = message;
-  el.classList.remove('hidden');
+  showEl(el);
 }
 
 function hideToast(el) {
-  if (el) el.classList.add('hidden');
+  hideEl(el);
 }
 
 function formatDate(dateStr) {
@@ -57,6 +55,12 @@ async function copyText(text) {
   }
 }
 
+function setBadge(el, text, online) {
+  if (!el) return;
+  el.textContent = text;
+  el.className = `badge ${online ? 'text-bg-success' : 'text-bg-secondary'}`;
+}
+
 /* ---------- HOME ---------- */
 async function initHome() {
   const qrImage = document.getElementById('qr-image');
@@ -74,8 +78,8 @@ async function initHome() {
   let lastCaptureUrl = '';
 
   async function loadSession() {
-    qrLoading.classList.remove('hidden');
-    qrImage.classList.add('hidden');
+    showEl(qrLoading);
+    hideEl(qrImage);
 
     try {
       const [sessionRes, networkRes] = await Promise.all([
@@ -95,32 +99,30 @@ async function initHome() {
       lastCaptureUrl = session.captureUrl;
 
       qrImage.src = session.qrDataUrl;
-      qrImage.classList.remove('hidden');
-      qrLoading.classList.add('hidden');
+      hideEl(qrLoading);
+      showEl(qrImage);
 
       captureUrlEl.textContent = session.captureUrl;
 
       if (isOnline) {
-        networkBadge.textContent = 'Disponível na internet';
-        networkBadge.classList.add('is-online');
+        setBadge(networkBadge, 'Disponível na internet', true);
         qrSubtitle.textContent = 'Qualquer convidado pode escanear e enviar';
         instructionsSubtitle.textContent = 'Sem necessidade de mesma rede Wi-Fi';
-        localNetworkBox.classList.add('hidden');
+        hideEl(localNetworkBox);
         openMobileLink.href = session.captureUrl;
       } else {
-        networkBadge.textContent = `Rede local · ${network.ip}`;
-        networkBadge.classList.remove('is-online');
+        setBadge(networkBadge, `Rede local · ${network.ip}`, false);
         qrSubtitle.textContent = 'Celular e computador na mesma rede Wi-Fi';
         instructionsSubtitle.textContent = 'Conexão local';
         networkUrlEl.textContent = networkCaptureUrl;
-        localNetworkBox.classList.remove('hidden');
+        showEl(localNetworkBox);
         openMobileLink.href = networkCaptureUrl;
       }
 
-      openMobileLink.classList.remove('hidden');
-      btnCopyLink.classList.remove('hidden');
+      showEl(openMobileLink);
+      showEl(btnCopyLink);
     } catch {
-      networkBadge.textContent = 'Erro ao carregar';
+      setBadge(networkBadge, 'Erro ao carregar', false);
       captureUrlEl.textContent = 'Verifique se o servidor está rodando.';
     }
   }
@@ -166,10 +168,7 @@ async function initCapture() {
   async function checkCamera() {
     if (!navigator.mediaDevices?.getUserMedia) {
       hideToast(toastCamera);
-      showToast(
-        toastError,
-        'Navegador sem suporte à câmera. Use Chrome ou Safari.'
-      );
+      showToast(toastError, 'Navegador sem suporte à câmera. Use Chrome ou Safari.');
       return false;
     }
     return true;
@@ -196,12 +195,11 @@ async function initCapture() {
       hideToast(toastCamera);
       hideToast(toastError);
       btnShutter.disabled = false;
-      document.body.classList.add('camera-ready');
     } catch (err) {
       hideToast(toastCamera);
       let msg = 'Não foi possível abrir a câmera.';
       if (err.name === 'NotAllowedError') {
-        msg = 'Permissão negada. Toque no cadeado da barra de endereço e libere a câmera.';
+        msg = 'Permissão negada. Libere a câmera nas configurações do navegador.';
       } else if (err.name === 'NotFoundError') {
         msg = 'Nenhuma câmera encontrada neste aparelho.';
       }
@@ -217,16 +215,16 @@ async function initCapture() {
 
   function enterPreviewMode() {
     document.body.classList.add('preview-mode');
-    dockCamera.classList.add('hidden');
-    dockPreview.classList.remove('hidden');
-    cameraFrame.classList.add('hidden');
+    hideEl(dockCamera);
+    showEl(dockPreview);
+    hideEl(cameraFrame);
   }
 
   function exitPreviewMode() {
     document.body.classList.remove('preview-mode');
-    dockPreview.classList.add('hidden');
-    dockCamera.classList.remove('hidden');
-    cameraFrame.classList.remove('hidden');
+    hideEl(dockPreview);
+    showEl(dockCamera);
+    showEl(cameraFrame);
   }
 
   btnShutter.addEventListener('click', () => {
@@ -243,8 +241,8 @@ async function initCapture() {
         if (!blob) return;
         capturedBlob = blob;
         preview.src = URL.createObjectURL(blob);
-        preview.classList.remove('hidden');
-        video.classList.add('hidden');
+        showEl(preview);
+        hideEl(video);
         stopCamera();
         enterPreviewMode();
       },
@@ -255,8 +253,8 @@ async function initCapture() {
 
   btnRetake.addEventListener('click', () => {
     capturedBlob = null;
-    preview.classList.add('hidden');
-    video.classList.remove('hidden');
+    hideEl(preview);
+    showEl(video);
     hideToast(toastError);
     exitPreviewMode();
     startCamera();
@@ -269,7 +267,7 @@ async function initCapture() {
     }
 
     hideToast(toastError);
-    loadingOverlay.classList.add('visible');
+    loadingOverlay.classList.add('show');
     btnUpload.disabled = true;
 
     const formData = new FormData();
@@ -283,14 +281,15 @@ async function initCapture() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Erro ao enviar');
 
-      dockPreview.classList.add('hidden');
-      successScreen.classList.remove('hidden');
+      hideEl(dockPreview);
+      successScreen.classList.remove('d-none');
+      successScreen.classList.add('d-flex');
       document.body.classList.add('upload-done');
     } catch (err) {
       showToast(toastError, err.message || 'Falha no envio. Tente de novo.');
       btnUpload.disabled = false;
     } finally {
-      loadingOverlay.classList.remove('visible');
+      loadingOverlay.classList.remove('show');
     }
   });
 
@@ -305,59 +304,52 @@ async function initAdmin() {
   const statToday = document.getElementById('stat-today');
   const btnRefresh = document.getElementById('btn-refresh-photos');
   const btnDownloadZip = document.getElementById('btn-download-zip');
-  const lightbox = document.getElementById('lightbox');
+  const modalEl = document.getElementById('photoModal');
+  const photoModal = bootstrap.Modal.getOrCreateInstance(modalEl);
   const lightboxImg = document.getElementById('lightbox-img');
   const lightboxId = document.getElementById('lightbox-id');
   const lightboxDate = document.getElementById('lightbox-date');
-  const lightboxClose = document.getElementById('lightbox-close');
   const lightboxPrev = document.getElementById('lightbox-prev');
   const lightboxNext = document.getElementById('lightbox-next');
   const lightboxDownload = document.getElementById('lightbox-download');
+  const photoModalLabel = document.getElementById('photoModalLabel');
 
   let photosList = [];
   let lightboxIndex = 0;
 
-  function openLightbox(index) {
-    if (!photosList.length) return;
-    lightboxIndex = index;
+  function updateModalNav() {
     const photo = photosList[lightboxIndex];
     lightboxImg.src = photo.image_path;
     lightboxImg.alt = `Foto ${photo.id}`;
-    lightboxId.textContent = `Foto ${photo.id}`;
+    photoModalLabel.textContent = `Foto ${photo.id}`;
+    lightboxId.textContent = `#${photo.id}`;
     lightboxDate.textContent = formatDate(photo.created_at);
     const ext = photo.image_path.match(/\.\w+$/)?.[0] || '.jpg';
     lightboxDownload.href = photo.image_path;
     lightboxDownload.download = `foto-${String(photo.id).padStart(4, '0')}${ext}`;
     lightboxPrev.disabled = lightboxIndex === 0;
     lightboxNext.disabled = lightboxIndex === photosList.length - 1;
-    lightbox.classList.remove('hidden');
-    document.body.style.overflow = 'hidden';
   }
 
-  function closeLightbox() {
-    lightbox.classList.add('hidden');
-    lightboxImg.src = '';
-    document.body.style.overflow = '';
+  function openLightbox(index) {
+    if (!photosList.length) return;
+    lightboxIndex = index;
+    updateModalNav();
+    photoModal.show();
   }
 
   function stepLightbox(delta) {
     const next = lightboxIndex + delta;
     if (next < 0 || next >= photosList.length) return;
-    openLightbox(next);
+    lightboxIndex = next;
+    updateModalNav();
   }
 
-  lightboxClose.addEventListener('click', closeLightbox);
-  lightbox.addEventListener('click', (e) => {
-    if (e.target === lightbox) closeLightbox();
-  });
   lightboxPrev.addEventListener('click', () => stepLightbox(-1));
   lightboxNext.addEventListener('click', () => stepLightbox(1));
 
-  document.addEventListener('keydown', (e) => {
-    if (lightbox.classList.contains('hidden')) return;
-    if (e.key === 'Escape') closeLightbox();
-    if (e.key === 'ArrowLeft') stepLightbox(-1);
-    if (e.key === 'ArrowRight') stepLightbox(1);
+  modalEl.addEventListener('hidden.bs.modal', () => {
+    lightboxImg.src = '';
   });
 
   async function loadPhotos() {
@@ -370,33 +362,33 @@ async function initAdmin() {
       statToday.textContent = photosList.filter((p) => isToday(p.created_at)).length;
 
       photosGrid.innerHTML = '';
-
       btnDownloadZip.disabled = photosList.length === 0;
 
       if (photosList.length === 0) {
-        emptyState.classList.remove('hidden');
-        photosGrid.classList.add('hidden');
+        showEl(emptyState);
+        hideEl(photosGrid);
         return;
       }
 
-      emptyState.classList.add('hidden');
-      photosGrid.classList.remove('hidden');
+      hideEl(emptyState);
+      showEl(photosGrid);
 
       photosList.forEach((photo, index) => {
-        const card = document.createElement('button');
-        card.type = 'button';
-        card.className = 'photo-card';
-        card.innerHTML = `
-          <div class="photo-thumb-wrap">
-            <img class="photo-thumb" src="${photo.image_path}" alt="Foto ${photo.id}" loading="lazy">
-          </div>
-          <div class="photo-info">
-            <div class="photo-id">Foto ${photo.id}</div>
-            <div class="photo-date">${formatDate(photo.created_at)}</div>
-          </div>
+        const col = document.createElement('div');
+        col.className = 'col';
+        col.innerHTML = `
+          <button type="button" class="photo-card-btn">
+            <div class="card shadow-sm h-100">
+              <img src="${photo.image_path}" class="card-img-top" alt="Foto ${photo.id}" loading="lazy">
+              <div class="card-body py-2 px-2">
+                <div class="small fw-semibold">Foto ${photo.id}</div>
+                <div class="text-muted" style="font-size: 0.7rem;">${formatDate(photo.created_at)}</div>
+              </div>
+            </div>
+          </button>
         `;
-        card.addEventListener('click', () => openLightbox(index));
-        photosGrid.appendChild(card);
+        col.querySelector('.photo-card-btn').addEventListener('click', () => openLightbox(index));
+        photosGrid.appendChild(col);
       });
     } catch {
       statTotal.textContent = '—';
