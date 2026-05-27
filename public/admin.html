@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#0a0a0f">
+  <title>Admin — Fotos Casamento</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body data-page="admin">
+  <div class="app-shell">
+    <header class="app-header">
+      <div class="logo">
+        <div class="logo-icon">🖼️</div>
+        <div>
+          <h1>Painel Admin</h1>
+          <p>Fotos enviadas pelos convidados</p>
+        </div>
+      </div>
+      <nav class="nav-links">
+        <a href="/" class="btn btn-secondary btn-sm">Gerar QR Code</a>
+        <button type="button" id="btn-refresh-photos" class="btn btn-primary btn-sm">
+          Atualizar
+        </button>
+      </nav>
+    </header>
+
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-value" id="stat-total">0</div>
+        <div class="stat-label">Total de fotos</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value" id="stat-today">0</div>
+        <div class="stat-label">Hoje</div>
+      </div>
+    </div>
+
+    <section class="card">
+      <h2 class="card-title">Galeria de fotos</h2>
+      <p class="card-subtitle">Atualiza automaticamente ao clicar em Atualizar</p>
+
+      <div id="photos-container">
+        <div class="empty-state" id="empty-state">
+          <div class="icon">📭</div>
+          <p>Nenhuma foto enviada ainda.</p>
+          <p class="mt-1">Gere um QR Code na página inicial.</p>
+        </div>
+        <div class="photos-grid hidden" id="photos-grid"></div>
+      </div>
+    </section>
+  </div>
+
+  <script src="/app.js"></script>
+</body>
+</html>
